@@ -51,14 +51,14 @@ function setFlightTimer(endTime, interaction, row) {
     clearTimeout(refuelTimer);
     console.log('timer initiated');
     landTime = endTime;
-    flightTimer = setTimeout(outOfFuel, /*endTime - (Math.floor(Date.now)/1000) * 1000 */ 20000, interaction, row);
+    flightTimer = setTimeout(outOfFuel, endTime - (Math.floor(Date.now)/1000) * 1000, interaction, row);
 }
 
 function setRefuelTimer(endTime, interaction, row) {
     clearTimeout(flightTimer);
     console.log('timer initiated');
     refuel = endTime;
-    refuelTimer = setTimeout(refueled, /*endTime - ((Math.floor(Date.now)/1000) * 1000*/20000, interaction, row)
+    refuelTimer = setTimeout(refueled, endTime - (Math.floor(Date.now)/1000) * 1000, interaction, row)
 }
 
 async function refueled(interaction, row) {
