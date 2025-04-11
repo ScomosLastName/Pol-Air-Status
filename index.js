@@ -1,5 +1,7 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const {Client, Events, SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle} = require("discord.js");
-const {token} = require("./config.json")
+
 
 const client = new Client({intents: []});
 
@@ -207,4 +209,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 })
 
-client.login(token);    
+client.login(process.env.DISCORD_TOKEN);    
