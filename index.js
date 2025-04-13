@@ -87,7 +87,7 @@ function setFlightTimer(time, interaction, row) {
 function setRefuelTimer(time, interaction, row) {
     clearTimeout(flightTimer);
     console.log('timer initiated');
-    refuel = time/1000 + Math.floor(Date.now()/1000);
+    refuelTime = time/1000 + Math.floor(Date.now()/1000);
     refuelTimer = setTimeout(refueled, time, interaction, row)
 }
 
@@ -135,7 +135,7 @@ async function refueled(interaction, row) {
 async function outOfFuel (interaction, row) {
     airWingAvaliable = false;
     airWingDeployed = false;
-    refuelTime = Math.floor(Date.now()/1000) + 1800
+    // refuelTime = Math.floor(Date.now()/1000) + 1800
 
     updateEmbed();  
 
@@ -165,7 +165,7 @@ async function outOfFuel (interaction, row) {
 
     const reply = await interaction.channel.send({ 
         embeds: [embed], 
-        fetchReply: true 
+        fetchReply: true
     });
     embedMessageId = reply.id;
 
@@ -208,9 +208,9 @@ client.once(Events.ClientReady, c => {
         .setName("toggle_pol_air")
         .setDescription("Deploys / Undeploys Pol Air")
 
-        const set_log_channel = new SlashCommandBuilder()
-            .setName('set_log_channel')
-            .setDescription('Sets the channel for deployment logs')
+    const set_log_channel = new SlashCommandBuilder()
+        .setName('set_log_channel')
+        .setDescription('Sets the channel for deployment logs')
 
     client.application.commands.create(init_embed);
     client.application.commands.create(toggle_pol_air);
@@ -249,10 +249,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
         
         if (airWingDeployed) {
-            setFlightTimer(5400000, interaction, row);
+            setFlightTimer(5400000/*5000*/, interaction, row);
             pilot = interaction.user.id;
         } else {
-            setRefuelTimer(1800000, interaction, row);
+            setRefuelTimer(1800000/*5000*/, interaction, row);
             pilot = null;
         }
 
