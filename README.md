@@ -15,7 +15,7 @@
 
 > [!WARNING]
 > If you restart the bot you will have to set it up again in discord!
->
+
 > [!CAUTION]
 > If the program crashes you will have to set it up again in discord!
 
