@@ -79,14 +79,14 @@ async function updateEmbed() {
 // TODO correct the timing when out of testing
 function setFlightTimer(time, interaction, row) {
     clearTimeout(refuelTimer);
-    console.log('timer initiated');
+    console.log(`Flight timer initiated ${time}`);
     landTime = time/1000 + Math.floor(Date.now()/1000);
     flightTimer = setTimeout(outOfFuel, time, interaction, row);
 }
 
 function setRefuelTimer(time, interaction, row) {
     clearTimeout(flightTimer);
-    console.log('timer initiated');
+    console.log(`refuel timer initiated ${time}`);
     refuelTime = time/1000 + Math.floor(Date.now()/1000);
     refuelTimer = setTimeout(refueled, time, interaction, row)
 }
@@ -135,9 +135,6 @@ async function refueled(interaction, row) {
 async function outOfFuel (interaction, row) {
     airWingAvaliable = false;
     airWingDeployed = false;
-    // refuelTime = Math.floor(Date.now()/1000) + 1800
-
-    updateEmbed();  
 
     const channelid = interaction.channelId;
 
@@ -163,13 +160,13 @@ async function outOfFuel (interaction, row) {
         }
     }
 
+    setRefuelTimer(1800000/*20000*/, interaction, row)
+    updateEmbed();
     const reply = await interaction.channel.send({ 
         embeds: [embed], 
         fetchReply: true
     });
     embedMessageId = reply.id;
-
-    setRefuelTimer(refuelTime, interaction, row)
 }
 
 function createLogEmbed(pilot, status, i) {
@@ -191,7 +188,6 @@ function createLogEmbed(pilot, status, i) {
             .addFields({ name: 'Undeployed By:', value: `<@${i.user.id}>`, inline: true })
             .setTimestamp()
     }
-    
     return logEmbed;
 }
 
@@ -203,7 +199,6 @@ client.once(Events.ClientReady, c => {
         .setName("init_embed")
         .setDescription("Example Embed")
         
-
     const toggle_pol_air = new SlashCommandBuilder()
         .setName("toggle_pol_air")
         .setDescription("Deploys / Undeploys Pol Air")
@@ -249,10 +244,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
         
         if (airWingDeployed) {
-            setFlightTimer(5400000/*5000*/, interaction, row);
+            setFlightTimer(5400000/*20000*/, interaction, row);
             pilot = interaction.user.id;
         } else {
-            setRefuelTimer(1800000/*5000*/, interaction, row);
             pilot = null;
         }
 
