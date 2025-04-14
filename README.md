@@ -9,8 +9,8 @@
 
 ## Other Commands
 
-## Develpment notes
- Ignore failed checks from the cloudflare worker, forgot to delete it after i worked out it didn't support discord.js.
-
 > [!WARNING]
 > If you restart the bot you woill have to set it up again in discord!
+
+## Develpment notes
+ Ignore failed checks from the cloudflare worker, forgot to delete it after i worked out it didn't support discord.js.
