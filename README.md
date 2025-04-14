@@ -19,5 +19,13 @@
 > [!CAUTION]
 > If the program crashes you will have to set it up again in discord!
 
+## Setting Command Permissions
+ To set command permissions:
+ 1. <ins>Server Settings</ins>
+ 2. <ins>Intergrations</ins>
+ 3. <ins>Pol Air Timer</ins> >  <ins>Manage </ins>
+ 4. add permissions to <ins>Roles & members</ins> for all commands
+ 5. add permission overides to specific commands in  <ins>commands </ins>
+
 ## Develpment notes
  Ignore failed checks from the cloudflare worker, forgot to delete it after i worked out it didn't support discord.js.
