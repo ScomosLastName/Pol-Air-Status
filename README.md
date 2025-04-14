@@ -10,6 +10,8 @@
     - In the channel you would like the log message to go to run.
 
 ## Other Commands
+ - /force_refuel
+   - Forces embed in and out of refuel mode reguardless of current status
 
 > [!WARNING]
 > If you restart the bot you will have to set it up again in discord!
