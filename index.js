@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 dotenv.config();
+const { flightLength, refuelLength } = require('./config.json');
 const {
     Client, 
     Events, 
@@ -160,7 +161,7 @@ async function outOfFuel (interaction, row) {
         }
     }
 
-    setRefuelTimer(1800000/*20000*/, interaction, row)
+    setRefuelTimer(refuelLength/*20000*/, interaction, row)
     updateEmbed();
     const reply = await interaction.channel.send({ 
         embeds: [embed], 
@@ -207,9 +208,14 @@ client.once(Events.ClientReady, c => {
         .setName('set_log_channel')
         .setDescription('Sets the channel for deployment logs')
 
+    const force_refuel = new SlashCommandBuilder()
+        .setName('force_refuel')
+        .setDescription('Force refuel Pol Air')
+
     client.application.commands.create(init_embed);
     client.application.commands.create(toggle_pol_air);
     client.application.commands.create(set_log_channel);
+    client.application.commands.create(force_refuel);
     updateEmbed();
 });
 
@@ -244,7 +250,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
         
         if (airWingDeployed) {
-            setFlightTimer(5400000/*20000*/, interaction, row);
+            setFlightTimer(flightLength/*20000*/, interaction, row);
             pilot = interaction.user.id;
         } else {
             pilot = null;
@@ -287,7 +293,88 @@ client.on(Events.InteractionCreate, async (interaction) => {
         interaction.reply({
             content: `Set to <#${logChannelId}>`,
             ephemeral: true
-        });    }
+        });
+    } else if (interaction.commandName === "force_refuel") {
+        if (airWingAvaliable) {
+            airWingAvaliable = false;
+            airWingDeployed = false;
+            
+            interaction.reply({
+                content: "Pol Air Forced to refuel",
+                ephemeral: true
+            });
+            clearTimeout(flightTimer);
+            setRefuelTimer(refuelLength/*20000*/, interaction, row);
+
+            updateEmbed();
+            const channelid = interaction.channelId;
+            try {
+                // Fetch the channel
+                const channel = await interaction.client.channels.fetch(channelid);
+            
+                if (channel) {
+                    // Fetch the message
+                    const message = await channel.messages.fetch(embedMessageId);
+                    
+                    // If the message exists, delete it
+                    await message.delete();
+                    console.log('Message deleted successfully.');
+                } else {
+                    console.error('Channel not found.');
+                }
+            } catch (error) {
+                if (error.code === 10008) {
+                    console.error('The message does not exist or has been deleted.');
+                } else {
+                    console.error('An error occurred while fetching or deleting the message:', error);
+                }
+            }
+            
+            const reply = await interaction.channel.send({ 
+                embeds: [embed], 
+                fetchReply: true
+            });
+            embedMessageId = reply.id;
+        } else if (!airWingDeployed) {
+            airWingAvaliable = true;
+            clearTimeout(refuelTimer);
+            interaction.reply({
+                content: "Pol Air has been refueled",
+                ephemeral: true
+            });
+
+            updateEmbed();
+            const channelid = interaction.channelId;
+            try {
+                // Fetch the channel
+                const channel = await interaction.client.channels.fetch(channelid);
+            
+                if (channel) {
+                    // Fetch the message
+                    const message = await channel.messages.fetch(embedMessageId);
+                    
+                    // If the message exists, delete it
+                    await message.delete();
+                    console.log('Message deleted successfully.');
+                } else {
+                    console.error('Channel not found.');
+                }
+            } catch (error) {
+                if (error.code === 10008) {
+                    console.error('The message does not exist or has been deleted.');
+                } else {
+                    console.error('An error occurred while fetching or deleting the message:', error);
+                }
+            }
+            const reply = await interaction.channel.send({ 
+                embeds: [embed], 
+                fetchReply: true,
+                components: [row]
+            });
+            embedMessageId = reply.id;
+        }
+    }
+
 });
 
 client.login(process.env.DISCORD_TOKEN);    
