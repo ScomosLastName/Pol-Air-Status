@@ -1,5 +1,7 @@
 # Pol Air Status
- Discord bot that tracks the use of Pol Air in Apollo networks baised on input via the bot
+ Discord bot that tracks the use of Pol Air in Apollo Networks or other use cases based on input via the bot.
+
+ The program was initally designed for use in Apollo Networks (FiveM) how ever could be easily adapted to different use cases.
 
 ## How to Initialise Bot
  1. /init_embed
