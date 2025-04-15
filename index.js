@@ -192,6 +192,32 @@ function createLogEmbed(pilot, status, i) {
     return logEmbed;
 }
 
+async function deleteMessage(interaction) {
+    const channelid = interaction.channelId;
+
+    try {
+        // Fetch the channel
+        const channel = await interaction.client.channels.fetch(channelid);
+    
+        if (channel) {
+            // Fetch the message
+            const message = await channel.messages.fetch(embedMessageId);
+            
+            // If the message exists, delete it
+            await message.delete();
+            console.log('Message deleted successfully.');
+        } else {
+            console.error('Channel not found.');
+        }
+    } catch (error) {
+        if (error.code === 10008) {
+            console.error('The message does not exist or has been deleted.');
+        } else {
+            console.error('An error occurred while fetching or deleting the message:', error);
+        }
+    }
+}
+
 client.once(Events.ClientReady, c => {
     console.log(`Logged in as ${c.user.username}`);
     console.log(`At ${Date.now()}`);
@@ -258,29 +284,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         updateEmbed();  
 
-        const channelid = interaction.channelId;
-
-        try {
-            // Fetch the channel
-            const channel = await interaction.client.channels.fetch(channelid);
-        
-            if (channel) {
-                // Fetch the message
-                const message = await channel.messages.fetch(embedMessageId);
-                
-                // If the message exists, delete it
-                await message.delete();
-                console.log('Message deleted successfully.');
-            } else {
-                console.error('Channel not found.');
-            }
-        } catch (error) {
-            if (error.code === 10008) {
-                console.error('The message does not exist or has been deleted.');
-            } else {
-                console.error('An error occurred while fetching or deleting the message:', error);
-            }
-        }
+        deleteMessage(interaction);
 
         const reply = await interaction.reply({ 
             embeds: [embed], 
