@@ -65,7 +65,7 @@ async function updateEmbed() {
         embed
             .setColor(0x57F287)
             .setTitle('POL AIR IS NOT DEPLOYED')
-            .setDescription('Pol Air is avaliable if their are adiquate units')
+            .setDescription('Pol Air is avaliable if there are adiquate units')
             .setFields({ name: 'Status:', value: 'Pol Air is currently not deployed', inline: true })
             .setTimestamp()
     } else if (!airWingAvaliable) {
