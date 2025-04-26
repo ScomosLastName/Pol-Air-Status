@@ -371,7 +371,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 }
             }
             if (pilot) {
-                DirectMessageUser(pilot, "Pol Air has ran out of fuel, please land **immediately!**")
+                DirectMessageUser(pilot, "Pol Air has ran out of fuel, please land __**immediately!**__")
             }
             
             const reply = await interaction.channel.send({ 
