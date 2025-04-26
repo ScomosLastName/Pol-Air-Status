@@ -77,7 +77,53 @@ async function updateEmbed() {
             .setTimestamp()
     }
 }
-// TODO correct the timing when out of testing
+
+function createLogEmbed(pilot, status, i) {
+    const logEmbed = new EmbedBuilder()
+    if (status) {
+        logEmbed
+            .setColor(0x5865F2)
+            .setTitle('Flight log')
+            .setDescription('Pol Air has been deployed!')
+            .setThumbnail('https://i.ibb.co/G3rbYFxN/image.png')
+            .addFields({ name: 'Deployed By:', value: `<@${i.user.id}>`, inline: true })
+            .setTimestamp()
+    } else {
+        logEmbed
+            .setColor(0x5865F2)
+            .setTitle('Flight log')
+            .setDescription('Pol Air has been undeployed!')
+            .setThumbnail('https://i.ibb.co/G3rbYFxN/image.png')
+            .addFields({ name: 'Undeployed By:', value: `<@${pilot}>`, inline: true })
+            .setTimestamp()
+    }
+    return logEmbed;
+}
+
+function createOutOfFuelEmbed(pilot) {
+    const logEmbed = new EmbedBuilder()
+    logEmbed
+            .setColor(0xED4245)
+            .setTitle('Flight log')
+            .setDescription('Pol Air has ran out of fuel!')
+            .setThumbnail('https://i.ibb.co/G3rbYFxN/image.png')
+            .addFields({ name: 'While piloted By:', value: `<@${pilot}>`, inline: true })
+            .setTimestamp()
+    return logEmbed;
+}
+
+function createForceRefuelLogEmbed(i) {
+    const logEmbed = new EmbedBuilder()
+    logEmbed
+            .setColor(0x57F287)
+            .setTitle('Forced Refuel')
+            .setDescription('Pol Air has been forced to refuel!')
+            .setThumbnail('https://i.ibb.co/G3rbYFxN/image.png')
+            .addFields({ name: 'Refuel performed by:', value: `<@${i.user.id}>`, inline: true })
+            .setTimestamp()
+    return logEmbed;
+}
+
 function setFlightTimer(time, interaction, row) {
     clearTimeout(refuelTimer);
     console.log(`Flight timer initiated ${time}`);
@@ -127,7 +173,7 @@ async function refueled(interaction, row) {
             fetchReply: true, 
             components: [row] 
         });
-
+        
         embedMessageId = reply.id;
     }
     airWingAvaliable = true;
@@ -161,35 +207,20 @@ async function outOfFuel (interaction, row) {
         }
     }
 
-    setRefuelTimer(refuelLength/*20000*/, interaction, row)
+    if (logChannelId) {
+        const logChannel = await interaction.client.channels.fetch(logChannelId);
+        await logChannel.send({
+            embeds: [createOutOfFuelEmbed(pilot)]
+        });
+    }
+
+    setRefuelTimer(refuelLength, interaction, row)
     updateEmbed();
     const reply = await interaction.channel.send({ 
         embeds: [embed], 
         fetchReply: true
     });
     embedMessageId = reply.id;
-}
-
-function createLogEmbed(pilot, status, i) {
-    const logEmbed = new EmbedBuilder()
-    if (status) {
-        logEmbed
-            .setColor(0x5865F2)
-            .setTitle('Flight log')
-            .setDescription('Pol Air has been deployed!')
-            .setThumbnail('https://i.ibb.co/G3rbYFxN/image.png')
-            .addFields({ name: 'Deployed By:', value: `<@${i.user.id}>`, inline: true })
-            .setTimestamp()
-    } else {
-        logEmbed
-            .setColor(0x5865F2)
-            .setTitle('Flight log')
-            .setDescription('Pol Air has been undeployed!')
-            .setThumbnail('https://i.ibb.co/G3rbYFxN/image.png')
-            .addFields({ name: 'Undeployed By:', value: `<@${i.user.id}>`, inline: true })
-            .setTimestamp()
-    }
-    return logEmbed;
 }
 
 client.once(Events.ClientReady, c => {
@@ -250,7 +281,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
         
         if (airWingDeployed) {
-            setFlightTimer(flightLength/*20000*/, interaction, row);
+            setFlightTimer(flightLength, interaction, row);
             pilot = interaction.user.id;
         } else {
             pilot = null;
@@ -304,7 +335,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 ephemeral: true
             });
             clearTimeout(flightTimer);
-            setRefuelTimer(refuelLength/*20000*/, interaction, row);
+            setRefuelTimer(refuelLength, interaction, row);
 
             updateEmbed();
             const channelid = interaction.channelId;
@@ -373,8 +404,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
             });
             embedMessageId = reply.id;
         }
-    }
 
+        if (logChannelId) {
+            const logChannel = await interaction.client.channels.fetch(logChannelId);
+            await logChannel.send({
+                embeds: [createForceRefuelLogEmbed(interaction)]
+            });
+        }
+    }
 });
 
-client.login(process.env.DISCORD_TOKEN);    
+client.login(process.env.DISCORD_TOKEN);
