@@ -53,6 +53,16 @@ var refuelTimer;
 var pilot;
 var logChannelId;
 
+function DirectMessageUser(userId, message) {
+    client.users.fetch(userId)
+        .then(user => {
+            user.send(message)
+                .then(() => console.log(`Message sent to user ${userId}`))
+                .catch(error => console.error(`Could not send message to user ${userId}:`, error));
+        })
+        .catch(error => console.error(`Could not fetch user ${userId}:`, error));
+}
+
 async function updateEmbed() {
     if (airWingDeployed && airWingAvaliable) {
         embed
@@ -359,6 +369,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 } else {
                     console.error('An error occurred while fetching or deleting the message:', error);
                 }
+            }
+            if (pilot) {
+                DirectMessageUser(pilot, "Pol Air has ran out of fuel, please land **immediately!**")
             }
             
             const reply = await interaction.channel.send({ 
