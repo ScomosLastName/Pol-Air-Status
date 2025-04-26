@@ -196,6 +196,11 @@ async function outOfFuel (interaction, row) {
 
     const channelid = interaction.channelId;
 
+    if (pilot && doDirectMessage) {
+        // Send a direct message to the pilot
+        DirectMessageUser(pilot, "Pol Air has ran out of fuel, please land __**immediately!**__")
+    }
+
     try {
         // Fetch the channel
         const channel = await interaction.client.channels.fetch(channelid);
