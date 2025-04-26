@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 dotenv.config();
-const { flightLength, refuelLength } = require('./config.json');
+const { flightLength, refuelLength} = require('./config.json');
 const {
     Client, 
     Events, 
@@ -52,6 +52,7 @@ var flightTimer;
 var refuelTimer;
 var pilot;
 var logChannelId;
+var doDirectMessage = false;
 
 function DirectMessageUser(userId, message) {
     client.users.fetch(userId)
@@ -253,10 +254,21 @@ client.once(Events.ClientReady, c => {
         .setName('force_refuel')
         .setDescription('Force refuel Pol Air')
 
+    //TODO: Add a command to toggle direct messages to the pilot when out of fuel
+    const toggle_direct_message = new SlashCommandBuilder()
+        .setName('toggle_direct_message')
+        .setDescription('Toggles direct messages to the pilot when out of fuel')
+        .addBooleanOption(option =>
+            option.setName('direct_message')
+                .setDescription('Whether to send direct messages to the pilot when out of fuel')
+                .setRequired(true)
+        );
+
     client.application.commands.create(init_embed);
     client.application.commands.create(toggle_pol_air);
     client.application.commands.create(set_log_channel);
     client.application.commands.create(force_refuel);
+    client.application.commands.create(toggle_direct_message);
     updateEmbed();
 });
 
@@ -370,7 +382,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
                     console.error('An error occurred while fetching or deleting the message:', error);
                 }
             }
-            if (pilot) {
+
+            if (pilot && doDirectMessage) {
+                // Send a direct message to the pilot
                 DirectMessageUser(pilot, "Pol Air has ran out of fuel, please land __**immediately!**__")
             }
             
@@ -424,6 +438,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 embeds: [createForceRefuelLogEmbed(interaction)]
             });
         }
+    } else if (interaction.commandName === "toggle_direct_message") {
+        doDirectMessage = interaction.options.getBoolean('direct_message');
+        interaction.reply({
+            content: `Direct messages to the pilot when out of fuel are now ${doDirectMessage ? 'enabled' : 'disabled'}`,
+            ephemeral: true
+        });
     }
 });
 
